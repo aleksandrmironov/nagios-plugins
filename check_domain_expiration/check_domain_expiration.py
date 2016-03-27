@@ -34,7 +34,17 @@ def get_days_till_exp(domain_name):
     except:
         return {'status': 'failure', 'output': 'unable to retrieve information for %s' % domain_name}
 
-    days_delta = (domain['expiration_date'] - datetime.datetime.now()).days
+    if not 'expiration_date' in domain.keys():
+        return {'status': 'failure', 'output': 'no expiration_date info for %s' % domain_name}
+
+    if type(domain['expiration_date']) is datetime.datetime:
+        days_delta = (domain['expiration_date'] - datetime.datetime.now()).days
+
+    elif type(domain['expiration_date']) is list:
+        days_delta = (domain['expiration_date'][0] - datetime.datetime.now()).days
+
+    else:
+        return {'status': 'failure', 'output': 'unknown expiration_date record type for %s' % domain_name}
 
     return {'status': 'success', 'output': days_delta}
 
